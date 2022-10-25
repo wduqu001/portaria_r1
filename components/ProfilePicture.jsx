@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import Image from 'next/image';
-import { PROFILE_PICTURE_BUCKET } from '../lib/constants';
+import { PROFILE_PICTURE_BUCKET } from '../constants/infrastructure';
 
 export default function ProfilePicture({
   uid,
@@ -78,7 +78,7 @@ export default function ProfilePicture({
         <div className="avatar no-image" style={{ height: size, width: size }} />
       )}
       <div style={{ width: size }}>
-        <label className="button primary block" htmlFor="single">
+        <label className="block text-sm font-medium text-gray-700 px-3 py-2 rounded-md" htmlFor="photo" style={{ cursor: 'pointer'}}>
           {uploading ? 'Uploading ...' : 'Upload'}
         </label>
         <input
@@ -87,7 +87,7 @@ export default function ProfilePicture({
             position: 'absolute',
           }}
           type="file"
-          id="single"
+          id="photo"
           accept="image/*"
           onChange={uploadPhoto}
           disabled={uploading}

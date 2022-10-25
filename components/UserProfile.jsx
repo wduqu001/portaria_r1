@@ -6,7 +6,7 @@ export default function UserProfile({ session }) {
   const supabase = useSupabaseClient();
   const user = useUser();
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [name, setName] = useState(null);
   const [cpf, setCpf] = useState('');
   const [address, setAddress] = useState(null);
@@ -79,7 +79,7 @@ export default function UserProfile({ session }) {
   }
 
   function onCPFChange(value) {
-    if(!value) return ``;
+    if (!value) return ``;
 
     let cpf = "";
     let parts = Math.ceil(value.length / 3);
@@ -96,76 +96,102 @@ export default function UserProfile({ session }) {
   }
 
   return (
-    <div className="form-widget">
-      <ProfilePicture
-        uid={user.id}
-        url={photoURL}
-        size={150}
-        onUpload={(url) => {
-          setPhotoURL(url);
-          updateProfile();
-        }}
-      />
-      <div>
-        <label htmlFor="email">Email</label>
-        <input id="email" type="text" value={session.user.email} disabled />
-      </div>
-      <div>
-        <label htmlFor="name">Name</label>
-        <input
-          id="name"
-          type="text"
-          value={name || ''}
-          onChange={(event) => setName(event.target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="cpf">CPF</label>
-        <input
-          id="cpf"
-          type="text"
-          value={onCPFChange(cpf) || ''}
-          maxLength="14"
-          onChange={(event) => setCpf(event.target.value.replace(/\D/g, ""))}
-        />
-      </div>
-      <div>
-        <label htmlFor="address">Address</label>
-        <input
-          id="address"
-          type="text"
-          value={address || ''}
-          onChange={(event) => setAddress(event.target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="accessGroup">Acess Group</label>
-        <select
-          className='button'
-          name="accessGroup"
-          id="accessGroup"
-          value={accessGroup?.toString() || ''}
-          onChange={(event) => setAccessGroup(Number.parseInt(event.target.value))}
-        >
-          <option value="1">Administrators</option>
-          <option value="2">Visitors</option>
-        </select>
-      </div>
+    <div className="p-4">
+      <header className="bg-white shadow">
+        <div className="mx-auto max-w-7xl py-6 px-4 sm:px-6 lg:px-8">
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">User Profile - Edit</h1>
+        </div>
+      </header>
+      <div className="mt-5 md:col-span-2 md:mt-0">
+        <form action="#" method="POST" onSubmit={updateProfile}>
+          <div className="overflow-hidden shadow sm:rounded-md">
+            <div className="bg-white px-4 py-5 sm:p-6">
+              <div className="grid grid-cols-6 gap-6">
+                <div className="col-span-6 sm:col-span-3">
+                  <ProfilePicture
+                    uid={user.id}
+                    url={photoURL}
+                    size={150}
+                    onUpload={(url) => {
+                      setPhotoURL(url);
+                      updateProfile();
+                    }}
+                  />
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                      Email
+                    </label>
+                    <input
+                      id="email"
+                      type="text"
+                      value={session.user.email}
+                      disabled
+                      autoComplete="email"
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                      Name
+                    </label>
+                    <input
+                      id="name"
+                      type="text"
+                      value={name || ''}
+                      onChange={(event) => setName(event.target.value)}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="cpf" className="block text-sm font-medium text-gray-700">
+                      CPF
+                    </label>
+                    <input
+                      id="cpf"
+                      type="text"
+                      value={onCPFChange(cpf) || ''}
+                      maxLength="14"
+                      onChange={(event) => setCpf(event.target.value.replace(/\D/g, ""))}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="address" className="block text-sm font-medium text-gray-700">Address</label>
+                    <input
+                      id="address"
+                      type="text"
+                      value={address || ''}
+                      onChange={(event) => setAddress(event.target.value)}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="accessGroup" className="block text-sm font-medium text-gray-700">Acess Group</label>
+                    <select
+                      name="accessGroup"
+                      id="accessGroup"
+                      value={accessGroup?.toString() || ''}
+                      onChange={(event) => setAccessGroup(Number.parseInt(event.target.value))}
+                      className="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                    >
+                      <option value="1">Administrators</option>
+                      <option value="2">Visitors</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
 
-      <div>
-        <button
-          className="button primary block"
-          onClick={() => updateProfile()}
-          disabled={loading}
-        >
-          {loading ? 'Loading ...' : 'Update'}
-        </button>
-      </div>
-
-      <div>
-        <button className="button block" onClick={() => supabase.auth.signOut()}>
-          Sign Out
-        </button>
+              <div className="bg-gray-50 px-4 py-3 text-right sm:px-6">
+                <button
+                  type="submit"
+                  className="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                >
+                  {loading ? 'Loading ...' : 'Save'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
       </div>
     </div>
   )
