@@ -36,11 +36,7 @@ export default function UsersPage() {
             }
 
             if (data) {
-                // The IF bellow is for demonstration purpose only! 
-                if(data.length === 0)
-                    setUsers([data[0], data[0], data[0], data[0], data[0], data[0], data[0], data[0], data[0], data[0]]);
-                else
-                    setUsers(data);
+                setUsers(data);
             }
         } catch (error) {
             alert('Error loading user data!');

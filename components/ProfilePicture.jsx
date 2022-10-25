@@ -3,7 +3,7 @@ import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import Image from 'next/image';
 import { PROFILE_PICTURE_BUCKET } from '../constants/infrastructure';
 
-export default function ProfilePicture({
+function ProfilePicture({
   uid,
   url,
   size,
@@ -96,3 +96,5 @@ export default function ProfilePicture({
     </div>
   )
 }
+
+export default ProfilePicture;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react';
-import ProfilePicture from './ProfilePicture';
+import { ProfilePicture } from './ProfilePicture';
 
 export default function UserProfile({ session }) {
   const supabase = useSupabaseClient();

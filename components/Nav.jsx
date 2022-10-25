@@ -3,6 +3,7 @@ import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, UserCircleIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ');
@@ -15,7 +16,7 @@ export default function Nav() {
 
     const navigation = [
         { name: 'Home', href: '/', current: router.pathname === '/' },
-        { name: 'Users', href: '/users', current: router.pathname === '/users'},
+        { name: 'Users', href: '/users', current: router.pathname === '/users' },
     ]
 
     function logout() {
@@ -64,17 +65,20 @@ export default function Nav() {
                                 <div className="hidden sm:ml-6 sm:block">
                                     <div className="flex space-x-4">
                                         {navigation.map((item) => (
-                                            <a
+                                            <Link
                                                 key={item.name}
                                                 href={item.href}
-                                                className={classNames(
-                                                    item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                                                    'px-3 py-2 rounded-md text-sm font-medium'
-                                                )}
-                                                aria-current={item.current ? 'page' : undefined}
                                             >
-                                                {item.name}
-                                            </a>
+                                                <a
+                                                    className={classNames(
+                                                        item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                                                        'px-3 py-2 rounded-md text-sm font-medium'
+                                                    )}
+                                                    aria-current={item.current ? 'page' : undefined}
+                                                >
+                                                    {item.name}
+                                                </a>
+                                            </Link>
                                         ))}
                                     </div>
                                 </div>
@@ -103,23 +107,28 @@ export default function Nav() {
                                         <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                                             <Menu.Item>
                                                 {({ active }) => (
-                                                    <a
-                                                        href="/users"
-                                                        className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
-                                                    >
-                                                        Your Profile
-                                                    </a>
+                                                    <Link href="/users">
+                                                        <a
+                                                            className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
+                                                        >
+                                                            Your Profile
+                                                        </a>
+                                                    </Link>
                                                 )}
                                             </Menu.Item>
                                             <Menu.Item>
                                                 {({ active }) => (
-                                                    <a
+                                                    <Link
                                                         href="#"
                                                         onClick={logout}
                                                         className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                                                     >
-                                                        Sign out
-                                                    </a>
+                                                        <a
+                                                            className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
+                                                        >
+                                                            Sign out
+                                                        </a>
+                                                    </Link>
                                                 )}
                                             </Menu.Item>
                                         </Menu.Items>

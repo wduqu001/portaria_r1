@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react';
-import ProfilePicture from './ProfilePicture';
+import ProfilePicture from '../../../components/ProfilePicture';
 
 export default function UserProfile({ session }) {
     const supabase = useSupabaseClient();
@@ -27,7 +27,7 @@ export default function UserProfile({ session }) {
             let { data, error, status } = await supabase
                 .from('users')
                 .select(`full_name, cpf, address, photo_url, access_group, status`)
-                .eq('id', user.id)
+                .eq('id', user && user.id)
                 .single();
 
             if (error && status !== 406) {
@@ -94,6 +94,8 @@ export default function UserProfile({ session }) {
 
         return cpf;
     }
+
+    if(!user) return <h1>No data to display!</h1>
 
     return (
         <div className="mt-10 sm:mt-0">

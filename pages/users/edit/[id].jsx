@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSupabaseClient } from '@supabase/auth-helpers-react';
-import ProfilePicture from '../../../components/ProfilePicture';
 import { useRouter } from 'next/router';
+import ProfilePicture from '../../../components/ProfilePicture';
 
 export default function UserProfile() {
     const supabase = useSupabaseClient();
