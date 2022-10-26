@@ -17,6 +17,7 @@ export default function Nav() {
     const navigation = [
         { name: 'Home', href: '/', current: router.pathname === '/' },
         { name: 'Users', href: '/users', current: router.pathname === '/users' },
+        { name: 'Access Groups', href: '/groups', current: router.pathname === '/groups' },
     ]
 
     function logout(evt) {
@@ -111,7 +112,7 @@ export default function Nav() {
                                                 {({ active }) => (
                                                     <Link href="/users">
                                                         <a
-                                                            className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
+                                                            className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
                                                         >
                                                             Your Profile
                                                         </a>
@@ -121,13 +122,14 @@ export default function Nav() {
                                             <Menu.Item>
                                                 {({ active }) => (
                                                     <Link
-                                                        onClick={logout}
+                                                        // onClick={logout}
+                                                        href="/logout"
                                                     >
-                                                        <span
-                                                            className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
+                                                        <a
+                                                            className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
                                                         >
                                                             Sign out
-                                                        </span>
+                                                        </a>
                                                     </Link>
                                                 )}
                                             </Menu.Item>
