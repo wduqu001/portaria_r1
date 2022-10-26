@@ -3,7 +3,7 @@ import { useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useRouter } from 'next/router';
 import ProfilePicture from '../../../components/ProfilePicture';
 
-export default function UserProfile() {
+export default function EditProfile() {
     const supabase = useSupabaseClient();
     const router = useRouter();
     const userId = router.query['id'];
@@ -19,7 +19,7 @@ export default function UserProfile() {
 
     useEffect(() => {
         getUserProfile()
-    }, [])
+    }, [supabase, router, userId])
 
     async function getUserProfile() {
         try {
@@ -38,12 +38,7 @@ export default function UserProfile() {
             }
 
             if (data) {
-                setName(data.full_name);
-                setCpf(data.cpf);
-                setAddress(data.address);
-                setPhotoURL(data.photo_url);
-                setAccessGroup(data.access_group);
-                setStatus(data.status);
+                loadUserData(data);
             }
         } catch (error) {
             alert('Error loading user data!');
@@ -53,26 +48,43 @@ export default function UserProfile() {
         }
     }
 
-    async function updateProfile() {
+    function loadUserData(data) {
+        setName(data.full_name);
+        setCpf(data.cpf);
+        setAddress(data.address);
+        setPhotoURL(data.photo_url);
+        setAccessGroup(data.access_group);
+        setStatus(data.status);
+    }
+
+    async function updateProfile(evt) {
+        evt && evt.preventDefault();
+
         try {
             setLoading(true)
             if (!userId) throw new Error('No user id');
 
             const updates = {
-                id: userId,
                 full_name: name,
                 cpf,
                 address,
                 photo_url: photoURL,
                 access_group: accessGroup,
-                status,
                 updated_at: new Date().toISOString(),
             }
 
-            let { error } = await supabase.from('users').upsert(updates);
+            let { data, error, status } = await supabase
+            .from('users')
+            .update(updates)
+            .eq('id', userId)
+            .single();
 
             if (error) throw error;
+
             alert('Profile updated!');
+            if (data) {
+                loadUserData(data);
+            }
         } catch (error) {
             alert('Error updating the data!');
             console.log(error);

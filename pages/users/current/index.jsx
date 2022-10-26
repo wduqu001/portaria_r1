@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react';
 import ProfilePicture from '../../../components/ProfilePicture';
 
-export default function UserProfile({ session }) {
+export default function CurrentProfile({ session }) {
     const supabase = useSupabaseClient();
     const user = useUser();
 
@@ -50,7 +50,9 @@ export default function UserProfile({ session }) {
         }
     }
 
-    async function updateProfile() {
+    async function updateProfile(evt) {
+        evt && evt.preventDefault();
+        
         try {
             setLoading(true)
             if (!user) throw new Error('No user');

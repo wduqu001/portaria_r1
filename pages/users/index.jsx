@@ -6,14 +6,15 @@ import { Spinner } from "../../components/Spinner";
 
 export default function UsersPage() {
     const supabase = useSupabaseClient();
-    const user = useUser();
+    const auth = useUser();
 
     const [users, setUsers] = useState([]);
+    const [currentUserData, setCurrentUserData] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         getUsers();
-    }, []);
+    }, [supabase]);
 
     async function getUsers() {
         try {
@@ -37,6 +38,7 @@ export default function UsersPage() {
 
             if (data) {
                 setUsers(data);
+                setCurrentUserData(data.find((usr) => usr.id === auth.id));
             }
         } catch (error) {
             alert('Error loading user data!');
@@ -46,7 +48,9 @@ export default function UsersPage() {
         }
     }
 
-    async function inviteUser() {
+    async function inviteUser(evt) {
+        evt && evt.preventDefault();
+        
         try {
             setLoading(true);
             const email = window.prompt('Invite new user', 'Inform the email here!');
@@ -69,7 +73,9 @@ export default function UsersPage() {
         }
     }
 
-    async function inactiveUser(id) {
+    async function inactiveUser(evt, id) {
+        evt && evt.preventDefault();
+
         try {
             setLoading(true);
 
@@ -105,7 +111,7 @@ export default function UsersPage() {
                     <div className="mt-4 whitespace-nowrap">
                         <button
                             className="active:bg-gray-700 bg-transparent border border-gray-600 border-solid btn-copy-code duration-150 ease-linear focus:outline-none font-bold hover:bg-gray-500 hover:text-white mb-1 mr-1 outline-none px-4 py-2 rounded text-gray-600 text-sm transition-all uppercase"
-                            onClick={(evt) => inviteUser()}
+                            onClick={(evt) => inviteUser(evt)}
                         >
                             Add User
                             <PlusIcon className="inline-block h-6 w-6 text-bg-800 py-1 font-we" aria-hidden="true" />
@@ -122,7 +128,7 @@ export default function UsersPage() {
                                     <th scope="col" className="text-sm font-medium text-white px-6 py-4 text-left">Name</th>
                                     <th scope="col" className="text-sm font-medium text-white px-6 py-4 text-left">CPF</th>
                                     <th scope="col" className="text-sm font-medium text-white px-6 py-4 text-left">Address</th>
-                                    <th scope="col" className="text-sm font-medium text-white px-6 py-4 text-left">access group</th>
+                                    <th scope="col" className="text-sm font-medium text-white px-6 py-4 text-left">Access group</th>
                                     <th scope="col" className="text-sm font-medium text-white px-6 py-4 text-left">Status</th>
                                     <th scope="col" className="text-sm font-medium text-white px-6 py-4 text-left"></th>
                                 </tr>
@@ -131,7 +137,7 @@ export default function UsersPage() {
                                 {users && users.map((user, idx) =>
                                     <tr key={idx} className="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.full_name}</td>
-                                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{"***" + user.cpf.substring(6)}</td>
+                                        <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{user.cpf ? "***" + user.cpf.substring(6) : '-'}</td>
                                         <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{user.address}</td>
                                         <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{user.access_group === 1 ? 'ADMINISTRATOR' : 'VISITOR'}</td>
                                         <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap" style={{ textTransform: "uppercase" }}>{user.status}</td>
@@ -145,15 +151,18 @@ export default function UsersPage() {
                                                     Edit
                                                 </a>
                                             </Link>
-                                            <button
-                                                onClick={() => inactiveUser(user.id)}
-                                                className="btn-copy-code text-red-500 bg-transparent border border-solid border-red-500 hover:bg-red-500 hover:text-white active:bg-red-600 font-bold uppercase text-sm px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                                                disabled={user.isDeleting}>
-                                                {user.isDeleting
-                                                    ? <span className="spinner-border spinner-border-sm"></span>
-                                                    : <span>Disable</span>
-                                                }
-                                            </button>
+                                            {
+                                                currentUserData.access_group === 1 &&
+                                                <button
+                                                    onClick={(e) => inactiveUser(e, user.id)}
+                                                    className="btn-copy-code text-red-500 bg-transparent border border-solid border-red-500 hover:bg-red-500 hover:text-white active:bg-red-600 font-bold uppercase text-sm px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                                                    disabled={user.isDeleting}>
+                                                    {user.isDeleting
+                                                        ? <span className="spinner-border spinner-border-sm"></span>
+                                                        : <span>Disable</span>
+                                                    }
+                                                </button>
+                                            }
                                         </td>
                                     </tr>
                                 )}
@@ -167,7 +176,7 @@ export default function UsersPage() {
                                 {users && !users.length &&
                                     <tr>
                                         <td colSpan="4" className="text-center">
-                                            <div className="p-2">No Users To Display</div>
+                                            <div className="p-2">No users to display</div>
                                         </td>
                                     </tr>
                                 }
