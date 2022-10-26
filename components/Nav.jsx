@@ -19,7 +19,9 @@ export default function Nav() {
         { name: 'Users', href: '/users', current: router.pathname === '/users' },
     ]
 
-    function logout() {
+    function logout(evt) {
+        evt && evt.preventDefault();
+        
         supabase.auth.signOut()
             .then(() => console.log("User has sign out!"))
             .catch((err) => console.error("Error: ", err))
@@ -119,15 +121,13 @@ export default function Nav() {
                                             <Menu.Item>
                                                 {({ active }) => (
                                                     <Link
-                                                        href="#"
                                                         onClick={logout}
-                                                        className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                                                     >
-                                                        <a
+                                                        <span
                                                             className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                                                         >
                                                             Sign out
-                                                        </a>
+                                                        </span>
                                                     </Link>
                                                 )}
                                             </Menu.Item>
