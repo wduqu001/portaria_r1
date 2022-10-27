@@ -14,7 +14,7 @@ export default function UsersPage() {
 
     useEffect(() => {
         getUsers();
-    }, [supabase]);
+    }, [supabase, auth]);
 
     async function getUsers() {
         try {
@@ -30,7 +30,7 @@ export default function UsersPage() {
                     access_group, 
                     status,
                     id (auth.users),
-                `);
+                `).order('full_name');
 
             if (error && status !== 406) {
                 throw error;
@@ -73,7 +73,41 @@ export default function UsersPage() {
         }
     }
 
-    async function inactiveUser(evt, id) {
+    async function turnUserActive(evt, id, idx) {
+        evt && evt.preventDefault();
+
+        try {
+            setLoading(true);
+
+            if (!id) throw new Error('No user was selected');
+
+            let { data, error, status } = await supabase
+                .from('users')
+                .update({
+                    status: 'active'
+                })
+                .eq('id', id)
+                .select()
+                .single();
+
+            if (error && status !== 406) {
+                throw error;
+            }
+
+            console.log("user is now active: ")
+            let updatedUsers = users;
+            updatedUsers[idx] = data;
+            setUsers(updatedUsers);
+
+        } catch (error) {
+            alert('Error loading user data!');
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    async function inactiveUser(evt, id, idx) {
         evt && evt.preventDefault();
 
         try {
@@ -87,13 +121,17 @@ export default function UsersPage() {
                     status: 'inactive'
                 })
                 .eq('id', id)
-                .select();
+                .select()
+                .single();
 
             if (error && status !== 406) {
                 throw error;
             }
 
-            console.log("user has been inactived: ", data)
+            console.log("user has been inactived: ")
+            let updatedUsers = users;
+            updatedUsers[idx] = data;
+            setUsers(updatedUsers);
 
         } catch (error) {
             alert('Error loading user data!');
@@ -110,7 +148,7 @@ export default function UsersPage() {
                     <h1 className="text-3xl font-bold text-gray-900">Users</h1>
                     <div className="mt-4 whitespace-nowrap">
                         <button
-                            className="active:bg-gray-700 bg-transparent border border-gray-600 border-solid btn-copy-code duration-150 ease-linear focus:outline-none font-bold hover:bg-gray-500 hover:text-white mb-1 mr-1 outline-none px-4 py-2 rounded text-gray-600 text-sm transition-all uppercase"
+                            className="active:bg-gray-700 bg-transparent border border-gray-600 border-solid duration-150 ease-linear focus:outline-none font-bold hover:bg-gray-500 hover:text-white mb-1 mr-1 outline-none px-4 py-2 rounded text-gray-600 text-sm transition-all uppercase"
                             onClick={(evt) => inviteUser(evt)}
                         >
                             Add User
@@ -134,7 +172,7 @@ export default function UsersPage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {users && users.map((user, idx) =>
+                                {currentUserData && users && users.map((user, idx) =>
                                     <tr key={idx} className="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.full_name}</td>
                                         <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">{user.cpf ? "***" + user.cpf.substring(6) : '-'}</td>
@@ -146,32 +184,42 @@ export default function UsersPage() {
                                                 href={`/users/edit/${user.id}`}
                                             >
                                                 <a
-                                                    className="active:bg-blue-600 bg-transparent border border-blue-500 border-solid btn-copy-code duration-150 ease-linear focus:outline-none font-bold hover:bg-blue-500 hover:text-white mb-1 mr-1 outline-none px-4 py-2 rounded text-blue-500 text-sm transition-all uppercase"
+                                                    className="bg-transparent border border-solid border-blue-500 hover:bg-blue-500 hover:text-white focus:outline-none font-bold mb-1 mr-1 outline-none px-4 py-2 rounded text-blue-500 text-sm ease-linear transition-all duration-150"
                                                 >
                                                     Edit
                                                 </a>
                                             </Link>
-                                            {
-                                                currentUserData.access_group === 1 &&
+                                            { currentUserData.access_group === 1 && user.status === 'active' &&
                                                 <button
-                                                    onClick={(e) => inactiveUser(e, user.id)}
-                                                    className="btn-copy-code text-red-500 bg-transparent border border-solid border-red-500 hover:bg-red-500 hover:text-white active:bg-red-600 font-bold uppercase text-sm px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                                                    disabled={user.isDeleting}>
-                                                    {user.isDeleting
+                                                    onClick={(e) => inactiveUser(e, user.id, idx)}
+                                                    className="text-red-500 bg-transparent border border-solid border-red-500 hover:bg-red-500 hover:text-white active:bg-red-600 font-bold uppercase text-sm px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                                                    disabled={loading}>
+                                                    {loading
                                                         ? <span className="spinner-border spinner-border-sm"></span>
                                                         : <span>Disable</span>
+                                                    }
+                                                </button>
+                                            }
+                                            { currentUserData.access_group === 1 && user.status === 'inactive' &&
+                                                <button
+                                                    onClick={(e) => turnUserActive(e, user.id, idx)}
+                                                    className="text-red-500 bg-transparent border border-solid border-red-500 hover:bg-red-500 hover:text-white active:bg-red-600 font-bold uppercase text-sm px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                                                    disabled={loading}>
+                                                    {loading
+                                                        ? <span className="spinner-border spinner-border-sm"></span>
+                                                        : <span>Enable</span>
                                                     }
                                                 </button>
                                             }
                                         </td>
                                     </tr>
                                 )}
-                                {!users &&
+                                {!users || !currentUserData ?(
                                     <tr>
                                         <td colSpan="4">
                                             <Spinner />
                                         </td>
-                                    </tr>
+                                    </tr>) : null
                                 }
                                 {users && !users.length &&
                                     <tr>
