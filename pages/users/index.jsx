@@ -86,7 +86,7 @@ export default function UsersPage() {
                 .update({
                     status: 'inactive'
                 })
-                .eq('id', user.id)
+                .eq('id', id)
                 .select();
 
             if (error && status !== 406) {
