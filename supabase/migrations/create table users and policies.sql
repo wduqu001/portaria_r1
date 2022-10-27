@@ -50,8 +50,8 @@ create policy "Admin users can update users"
 create or replace function public.handle_new_user()
 returns trigger as $$
   begin
-    insert into public.users (id, full_name, created_at, photo_url)
-    values (new.id, 'NEW_USER_INCOMPLETE', new.created_at, 'evilparrot.gif');
+    insert into public.users (id, full_name, cpf, created_at, photo_url)
+    values (new.id, 'NEW_USER_INCOMPLETE', 10000000001, new.created_at, 'evilparrot.gif');
     return new;
   end;
 $$ language plpgsql security definer;
